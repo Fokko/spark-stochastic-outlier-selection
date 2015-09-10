@@ -24,7 +24,7 @@ object StochasticOutlierDetection {
     oMatrix.collect()
   }
 
-  private def binarySearch(affinity: DenseVector[Double],
+  def binarySearch(affinity: DenseVector[Double],
                    logPerplexity: Double,
                    maxIterations: Int,
                    tolerance: Double,
@@ -64,14 +64,14 @@ object StochasticOutlierDetection {
     dMatrix.map(r => (r._1, binarySearch(new DenseVector(r._2), logPerplexity, maxIterations, tolerance)))
   }
 
-  private def euclDistance(a: Array[Double], b: Array[Double]): Double = sqrt((a zip b).map { case (x, y) => pow(y - x, 2) }.sum)
+  def euclDistance(a: Array[Double], b: Array[Double]): Double = sqrt((a zip b).map { case (x, y) => pow(y - x, 2) }.sum)
 
-  private def computeBindingProbabilities(rows: RDD[(Long, DenseVector[Double])]): RDD[(Long, Array[Double])] =
+  def computeBindingProbabilities(rows: RDD[(Long, DenseVector[Double])]): RDD[(Long, Array[Double])] =
     rows.map(r => (r._1, (r._2 :/ sum(r._2)).toArray))
 
-  private def computeDistanceMatrix(data: RDD[Array[Double]]): RDD[(Long, Array[Double])] = computeDistanceMatrixPair(data.zipWithUniqueId().map(_.swap))
+  def computeDistanceMatrix(data: RDD[Array[Double]]): RDD[(Long, Array[Double])] = computeDistanceMatrixPair(data.zipWithUniqueId().map(_.swap))
 
-  private def computeDistanceMatrixPair(data: RDD[(Long, Array[Double])]): RDD[(Long, Array[Double])] =
+  def computeDistanceMatrixPair(data: RDD[(Long, Array[Double])]): RDD[(Long, Array[Double])] =
     data.cartesian(data).flatMap {
       case (a: (Long, Array[Double]), b: (Long, Array[Double])) =>
         if (a._1 != b._1)
