@@ -1,4 +1,4 @@
-package frl.driesprong
+package frl.driesprong.outlierdectection
 
 import org.apache.spark.{SparkConf, SparkContext}
 

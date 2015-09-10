@@ -1,4 +1,4 @@
-package frl.driesprong
+package frl.driesprong.outlierdectection
 
 import breeze.linalg.{DenseVector, sum}
 import breeze.numerics.{pow, sqrt}

@@ -1,6 +1,7 @@
-package frl.driesprong
+package frl.driesprong.outlierdetection
 
 import breeze.linalg.{DenseVector, sum}
+import frl.driesprong.outlierdectection.StochasticOutlierDetection
 import org.apache.spark.{SparkConf, SparkContext}
 import org.scalactic.TolerantNumerics
 import org.scalatest._
