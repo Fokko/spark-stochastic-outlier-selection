@@ -1,12 +1,8 @@
 package frl.driesprong
 
-import org.apache.spark.mllib.outlier.StochasticOutlierDetection
 import org.apache.spark.{SparkConf, SparkContext}
 
-/**
- * Created by fokko on 10-9-15.
- */
-object EvaluateOutlierDetectionDistributed {
+object EvaluateOutlierDetection {
 
   def main(args: Array[String]) {
     val conf = new SparkConf()

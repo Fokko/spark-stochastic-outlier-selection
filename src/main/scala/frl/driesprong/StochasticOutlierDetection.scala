@@ -1,4 +1,4 @@
-package org.apache.spark.mllib.outlier
+package frl.driesprong
 
 import breeze.linalg.{DenseVector, sum}
 import breeze.numerics.{pow, sqrt}
