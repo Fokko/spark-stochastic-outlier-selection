@@ -3,7 +3,6 @@ name := "Spark Stochastic Outlier Selection"
 
 version := "0.1.0"
 
-
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
   if (isSnapshot.value)
@@ -11,6 +10,11 @@ publishTo := {
   else
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
+
+lazy val core = (project in file(".")).settings(
+  organization := "frl.driesprong"
+  //other properties here
+)
 
 publishMavenStyle := true
 
