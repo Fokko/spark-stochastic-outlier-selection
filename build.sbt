@@ -45,10 +45,10 @@ pomExtra := (
     </developers>)
 
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
-libraryDependencies += "org.apache.spark" % "spark-core_2.11" % "1.6.2"
+libraryDependencies += "org.apache.spark" %% "spark-core" % "2.0.0"
 
-libraryDependencies += "org.apache.spark" % "spark-mllib_2.11" % "1.6.2"
+libraryDependencies += "org.apache.spark" %% "spark-mllib" % "2.0.0"
 
-libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.5" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.5" % "test"
