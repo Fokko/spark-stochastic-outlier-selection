@@ -6,7 +6,7 @@ object EvaluateOutlierDetection {
 
   def main(args: Array[String]) {
     val conf = new SparkConf()
-      .setMaster("local[*]")
+      .setMaster("local")
       .setAppName("Stochastic Outlier Selection")
 
     val sc = new SparkContext(conf)
