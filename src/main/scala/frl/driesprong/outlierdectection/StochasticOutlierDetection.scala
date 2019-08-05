@@ -13,7 +13,7 @@ object StochasticOutlierDetection {
 
   def performOutlierDetection(inputVectors: RDD[(Long, Array[Double])],
                               perplexity: Double = DefaultPerplexity,
-                              tolerance: Double = DefaultPerplexity,
+                              tolerance: Double = DefaultTolerance,
                               maxIterations: Int = DefaultIterations ): Array[(Long, Double)] = {
 
     val dMatrix = StochasticOutlierDetection.computeDistanceMatrixPair(inputVectors)
