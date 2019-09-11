@@ -24,6 +24,7 @@ object StochasticOutlierDetection {
     oMatrix.collect()
   }
 
+  @scala.annotation.tailrec
   def binarySearch(affinity: DenseVector[Double],
                    logPerplexity: Double,
                    maxIterations: Int,

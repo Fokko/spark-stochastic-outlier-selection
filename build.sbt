@@ -8,7 +8,7 @@ publishTo := {
   if (isSnapshot.value)
     Some("snapshots" at nexus + "content/repositories/snapshots")
   else
-    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
 }
 
 lazy val core = (project in file(".")).settings(
@@ -44,10 +44,10 @@ pomExtra := (
       </developer>
     </developers>)
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.11.12"
 
-libraryDependencies += "org.apache.spark" %% "spark-core" % "2.2.0"
-
-libraryDependencies += "org.apache.spark" %% "spark-mllib" % "2.2.0"
-
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+libraryDependencies ++= Seq(
+  "org.apache.spark" %% "spark-core" % "2.4.4",
+  "org.apache.spark" %% "spark-mllib" % "2.4.4",
+  "org.scalatest" %% "scalatest" % "3.0.8" % Test
+)
