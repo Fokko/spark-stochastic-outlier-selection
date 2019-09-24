@@ -1,15 +1,20 @@
-package frl.driesprong.outlierdetection
+package org.apache.spark.ml.outlierdetection
 
 import breeze.linalg.{DenseVector, sum}
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.ml.linalg.{DenseVector => SparkDenseVector}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SparkSession
 import org.scalactic.{Equality, TolerantNumerics}
 import org.scalatest._
 
 // Unit-tests created based on the Python script of https://github.com/jeroenjanssens/sos
-class StocasticOutlierDetectionTest extends FlatSpec with Matchers with BeforeAndAfter with PrivateMethodTester {
-  val master = "local"
-  val conf: SparkConf = new SparkConf().setAppName(this.getClass().getSimpleName()).setMaster(master)
-  val sc = new SparkContext(conf)
+class StocasticOutlierDetectionTest extends FlatSpec with Matchers with BeforeAndAfter {
+
+  val spark: SparkSession = SparkSession
+    .builder()
+    .master("local[*]")
+    .config("spark.driver.allowMultipleContexts", value = true)
+    .getOrCreate()
 
   val perplexity = 3.0
 
@@ -18,13 +23,13 @@ class StocasticOutlierDetectionTest extends FlatSpec with Matchers with BeforeAn
 
   "Computing the distance matrix " should "give symmetrical distances" in {
 
-    val seqData = Seq(
-      (0L, Array(1.0, 3.0)),
-      (1L, Array(5.0, 1.0)),
-      (2L, Array(2.2, 2.2))
+    val seqData: Seq[(Long, SparkDenseVector)] = Seq(
+      (0L, new SparkDenseVector(Array(1.0, 3.0))),
+      (1L, new SparkDenseVector(Array(5.0, 1.0))),
+      (2L, new SparkDenseVector(Array(2.2, 2.2)))
     )
 
-    val data = sc.parallelize(seqData)
+    val data: RDD[(Long, SparkDenseVector)] = spark.sparkContext.parallelize(seqData)
 
     val dMatrix = StochasticOutlierDetection.computeDistanceMatrix(data).collectAsMap()
 
@@ -38,11 +43,11 @@ class StocasticOutlierDetectionTest extends FlatSpec with Matchers with BeforeAn
 
   "Computing the distance matrix " should "give the correct distances" in {
 
-    val data = sc.parallelize(
+    val data: RDD[(Long, SparkDenseVector)] = spark.sparkContext.parallelize(
       Seq(
-        (0L, Array(1.0, 1.0)),
-        (1L, Array(2.0, 2.0)),
-        (2L, Array(5.0, 1.0))
+        (0L, new SparkDenseVector(Array(1.0, 1.0))),
+        (1L, new SparkDenseVector(Array(2.0, 2.0))),
+        (2L, new SparkDenseVector(Array(5.0, 1.0)))
       ))
 
     val dMatrix = StochasticOutlierDetection.computeDistanceMatrix(data).collectAsMap()
@@ -82,7 +87,7 @@ class StocasticOutlierDetectionTest extends FlatSpec with Matchers with BeforeAn
 
     /*
     >>> get_perplexity(np.array([1,2,3,4]), 3)
-    (0.2081763951839819, array([4.97870684e-02, 2.47875218e-03, 1.23409804e-04, 6.14421235e-06]))
+    (0.2081763951839819, new SparkDenseVector(([4.97870684e-02, 2.47875218e-03, 1.23409804e-04, 6.14421235e-06]))
      */
 
     output._1 should be(0.2081763951839819)
@@ -92,13 +97,13 @@ class StocasticOutlierDetectionTest extends FlatSpec with Matchers with BeforeAn
   "Compute the affinity" should "give the correct affinity" in {
 
     // The datapoints
-    val data = sc.parallelize(
+    val data: RDD[(Long, SparkDenseVector)] = spark.sparkContext.parallelize(
       Seq(
-        (0L, Array(1.0, 1.0)),
-        (1L, Array(2.0, 1.0)),
-        (2L, Array(1.0, 2.0)),
-        (3L, Array(2.0, 2.0)),
-        (4L, Array(5.0, 8.0)) // The outlier!
+        (0L, new SparkDenseVector(Array(1.0, 1.0))),
+        (1L, new SparkDenseVector(Array(2.0, 1.0))),
+        (2L, new SparkDenseVector(Array(1.0, 2.0))),
+        (3L, new SparkDenseVector(Array(2.0, 2.0))),
+        (4L, new SparkDenseVector(Array(5.0, 8.0))) // The outlier!
       ))
 
     /*
@@ -161,17 +166,17 @@ class StocasticOutlierDetectionTest extends FlatSpec with Matchers with BeforeAn
 
     aMatrix.size should be(5)
     aMatrix.head._2.size should be(4)
-    aMatrix(0) should be(DenseVector(0.46466276524577704, 0.46466276524577704, 0.3382687394674377, 0.002071952211368232))
-    aMatrix(1) should be(DenseVector(0.44804626736879755, 0.3212891538762665, 0.44804626736879755, 0.0022108233460722557))
-    aMatrix(2) should be(DenseVector(0.43192525601205634, 0.30506325262816036, 0.43192525601205634, 0.0023490595181415333))
-    aMatrix(3) should be(DenseVector(0.2837044890495805, 0.4103155587026411, 0.4103155587026411, 0.0025393148189994897))
-    aMatrix(4) should be(DenseVector(1.6502458086204375E-6, 3.4496775759599478E-6, 6.730049701933432E-6, 1.544221669904019E-5))
+    aMatrix(0) should be(DenseVector(0.46466276524892347, 0.46466276524892347, 0.3382687394706771, 0.002071952211481348))
+    aMatrix(1) should be(DenseVector(0.44804626736592407, 0.32128915387335244, 0.44804626736592407, 0.002210823345964273))
+    aMatrix(2) should be(DenseVector(0.43192525600789167, 0.3050632526240005, 0.43192525600789167, 0.0023490595179782026))
+    aMatrix(3) should be(DenseVector(0.2837044890481323, 0.41031555870116004, 0.41031555870116004, 0.0025393148189380038))
+    aMatrix(4) should be(DenseVector(1.6502458086112328E-6, 3.4496775759417726E-6, 6.730049701899862E-6, 1.544221669896851E-5))
   }
 
   "Verify the binding probabilities " should "give the correct probabilities" in {
 
     // The distance matrix
-    val dMatrix = sc.parallelize(
+    val dMatrix = spark.sparkContext.parallelize(
       Seq(
         (0L, new DenseVector(Array(6.61626106e-112, 1.27343495e-088))),
         (1L, new DenseVector(Array(2.21858114e-020, 1.12846575e-044))),
@@ -192,7 +197,7 @@ class StocasticOutlierDetectionTest extends FlatSpec with Matchers with BeforeAn
 
   "Verifying the product " should "should provide valid products" in {
 
-    val data = sc.parallelize(
+    val data = spark.sparkContext.parallelize(
       Seq(
         (0L, Array(/*0.0,*/ 0.5, 0.3)),
         (1L, Array(0.25, /*0.0,*/ 0.1)),
@@ -229,13 +234,13 @@ class StocasticOutlierDetectionTest extends FlatSpec with Matchers with BeforeAn
   "Verifying the output of the SOS algorithm " should "assign the one true outlier" in {
 
     // The datapoints
-    val data = sc.parallelize(
+    val data: RDD[(Long, SparkDenseVector)] = spark.sparkContext.parallelize(
       Seq(
-        (0L, Array(1.0, 1.0)),
-        (1L, Array(2.0, 1.0)),
-        (2L, Array(1.0, 2.0)),
-        (3L, Array(2.0, 2.0)),
-        (4L, Array(5.0, 8.0)) // The outlier!
+        (0L, new SparkDenseVector(Array(1.0, 1.0))),
+        (1L, new SparkDenseVector(Array(2.0, 1.0))),
+        (2L, new SparkDenseVector(Array(1.0, 2.0))),
+        (3L, new SparkDenseVector(Array(2.0, 2.0))),
+        (4L, new SparkDenseVector(Array(5.0, 8.0))) // The outlier!
       ))
 
     // Process the steps of the algorithm

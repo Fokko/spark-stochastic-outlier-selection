@@ -1,31 +1,41 @@
 package frl.driesprong.outlierdetection
 
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.{concat_ws, lit, max, min}
 
 object EvaluateOutlierDetection {
 
   def main(args: Array[String]) {
-    val conf = new SparkConf()
-      .setMaster("local")
-      .setAppName("Stochastic Outlier Selection")
+    val spark = SparkSession
+      .builder()
+      .appName("Stochastic Outlier Selection")
+      .getOrCreate()
 
-    val sc = new SparkContext(conf)
+    var df = spark.read.option("header", "true").csv("data/cardataset.csv")
 
-    val toyDataset = Array(
-      Array(1.00, 1.00),
-      Array(3.00, 1.25),
-      Array(3.00, 3.00),
-      Array(1.00, 3.00),
-      Array(2.25, 2.25),
-      Array(8.00, 2.00)
-    )
+    val vector_columns = Array("Engine HP", "Engine Cylinders", "highway MPG", "city mpg", "MSRP")
 
-    val rdd = sc.parallelize(toyDataset)
 
-    StochasticOutlierDetection.performOutlierDetection(rdd).foreach(x =>
-      System.out.println(x._1 + " : " + x._2)
-    )
+    vector_columns.foreach { col =>
+      df = df.withColumn(col, df(col).cast("Double"))
+      val minValue = lit(df.select(min(df(col))).first()(0))
+      val maxValue = lit(df.select(max(df(col))).first()(0))
+      println("Col " + col + " min " + minValue + ", max: " + maxValue)
+      df = df.withColumn(col, (df(col) - minValue) / (maxValue - minValue))
+    }
 
-    sc.stop()
+    val ass = new VectorAssembler().setInputCols(vector_columns).setOutputCol("vector")
+
+    df = df.withColumn("label", concat_ws(" ", df("Make"), df("Model"), df("Year"), df("Engine Fuel Type"), df("Transmission Type")))
+
+    df.count()
+
+    df = ass.setHandleInvalid("skip").transform(df)
+    df.count()
+
+    val output = org.apache.spark.ml.outlierdetection.StochasticOutlierDetection.performOutlierDetectionDf(df)
+
+    output.collect()
   }
 }

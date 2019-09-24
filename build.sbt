@@ -44,7 +44,7 @@ pomExtra := (
       </developer>
     </developers>)
 
-scalaVersion := "2.12.10"
+scalaVersion := "2.11.12"
 
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % "2.4.4",
