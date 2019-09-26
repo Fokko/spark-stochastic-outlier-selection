@@ -1,50 +1,36 @@
 
 name := "Spark Stochastic Outlier Selection"
 
-version := "0.1.0"
+version := "0.2.0"
 
-publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
+publishTo := sonatypePublishToBundle.value
 
-lazy val core = (project in file(".")).settings(
-  organization := "frl.driesprong"
-  //other properties here
-)
+sonatypeProfileName := "frl.driesprong"
 
+// To sync with Maven central, you need to supply the following information:
 publishMavenStyle := true
 
-publishArtifact in Test := false
+// Open-source license of your choice
+licenses := Seq("APL2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
-pomIncludeRepository := { _ => false }
+import xerial.sbt.Sonatype._
+sonatypeProjectHosting := Some(GitHubHosting("Fokko", "spark-stochastic-outlier-selection", "fokko@apache.org"))
 
-pomExtra := (
-  <url>https://github.com/Fokko/spark-stochastic-outlier-selection</url>
-    <licenses>
-      <license>
-        <name>The Apache License, Version 2.0</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      </license>
-    </licenses>
-    <scm>
-      <connection>scm:git:git@github.com:Fokko/spark-stochastic-outlier-selection.git</connection>
-      <developerConnection>scm:git:git@github.com:Fokko/spark-stochastic-outlier-selection.git</developerConnection>
-      <url>git@github.com:Fokko/spark-stochastic-outlier-selection.git</url>
-    </scm>
-    <developers>
-      <developer>
-        <name>Fokko Driesprong</name>
-        <email>fokko@driesprong.frl</email>
-        <organization>Driesprong</organization>
-        <organizationUrl>http://driesprong.frl</organizationUrl>
-      </developer>
-    </developers>)
+// or if you want to set these fields manually
+homepage := Some(url("https://github.com/Fokko/spark-stochastic-outlier-selection"))
+scmInfo := Some(
+  ScmInfo(
+    url("https://github.com/Fokko/spark-stochastic-outlier-selection"),
+    "scm:git@github.com:Fokko/spark-stochastic-outlier-selection.git"
+  )
+)
+developers := List(
+  Developer(id="Fokko", name="Fokko Driesprong", email="fokko@apache.org", url=url("https://github.com/Fokko"))
+)
 
-scalaVersion := "2.12.10"
+crossScalaVersions := Seq("2.11.12", "2.12.10")
+
+scalaVersion := "2.11.12"
 
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % "2.4.4",

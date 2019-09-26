@@ -30,11 +30,11 @@ df = ass.setHandleInvalid("skip").transform(df).repartition(22)
 # As perplexity, use the sqrt of the number of rows
 perplexity = math.sqrt(num)
 
+# Some helpers for the Java reference objects
 jvm = sc._jvm
 sqlContext = df._jdf
 
-
-sos = jvm.org.apache.spark.ml.outlierdetection.StochasticOutlierDetection().performOutlierDetectionPython(spark._jwrapped, df._jdf, "label", "vector", perplexity)
+sos = jvm.org.apache.spark.ml.outlierdetection.StochasticOutlierDetection.performOutlierDetectionPython(spark._jwrapped, df._jdf, "label", "vector", perplexity, 1e-9, 5000)
 
 # Reconstruct the Python DF
 result_df = _java2py(sc, sos)
