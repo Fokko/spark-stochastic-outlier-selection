@@ -41,7 +41,8 @@ class StocasticOutlierDetectionIntegrationTest extends FlatSpec with Matchers wi
 
     val result = spark.createDataFrame(output).toDF("label", "score").cache()
 
-    //    println(result.show())
+//    println(result.show())
+//    Thread.sleep(2200000)
 
     spark.stop()
   }

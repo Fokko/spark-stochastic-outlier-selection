@@ -166,6 +166,7 @@ object StochasticOutlierDetection {
    */
   private[outlierdetection] def computeDistanceMatrix(data: RDD[(Long, SparkDenseVector)]): RDD[(Long, Array[Double])] =
     data
+      .cache()
       .cartesian(data)
       .map(row => row._1._1 -> (row._2._1, euclideanDistance(row._1._2.asBreeze, row._2._2.asBreeze)))
       // Remove the distance to itself, i.e. the diagonal of the matrix
